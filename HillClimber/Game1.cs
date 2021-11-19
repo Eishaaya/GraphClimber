@@ -110,7 +110,7 @@ namespace HillClimber
             midBeam = new ScalableSprite(Content.Load<Texture2D>("Pixel"), new Vector2(535, 0), Color.Black, 0, SpriteEffects.None, new Vector2(.5f, 0), new Vector2(10, 1080), 1);
             gridLines.Add(midBeam);
 
-            numberLine = new Sprite(Content.Load<Texture2D>("Linear"), new Vector2(0, 0));
+            //numberLine = new Sprite(Content.Load<Texture2D>("Linear"), new Vector2(0, 0));
 
             int lineAmount = 20;
 
@@ -128,10 +128,10 @@ namespace HillClimber
             drawnSegment = new ScalableSprite(Content.Load<Texture2D>("LineSegment"), Vector2.Zero, Color.Gold, 0, SpriteEffects.None, new Vector2(0, 7.5f), new Vector2(1));
 
             MakeButttxt = Content.Load<Texture2D>("MakeButton");
-            LinearButttxt = Content.Load<Texture2D>("LinearButton");
-            TimeXPosButttxt = Content.Load<Texture2D>("2DButton");
+           // LinearButttxt = Content.Load<Texture2D>("LinearButton");
+            //TimeXPosButttxt = Content.Load<Texture2D>("2DButton");
 
-            darkLinetxt = Content.Load<Texture2D>("DarkLine");
+            //darkLinetxt = Content.Load<Texture2D>("DarkLine");
 
             run = new Button(Content.Load<Texture2D>("RunButton"), new Vector2(bounds.X - 400, 0));
             pointMaker = new Button(MakeButttxt, new Vector2(bounds.X - 300, 0));
@@ -586,23 +586,10 @@ namespace HillClimber
         {
             spriteBatch.Begin();
 
-            delete.Draw(spriteBatch);
-            clear.Draw(spriteBatch);
-            run.Draw(spriteBatch);
-            pointMaker.Draw(spriteBatch);
 
-            xLabel.Draw(spriteBatch);
-            yLabel.Draw(spriteBatch);
-            arrangementLabel.Draw(spriteBatch);
 
-            settingsBox.Draw(spriteBatch);
-            GraphicsDevice.Clear(Color.SlateGray);
+
             graphBackGround.Draw(spriteBatch);
-            indexLabel.Print(spriteBatch);
-            timeLabel.Draw(spriteBatch);
-
-
-
             //numberLine.Draw(spriteBatch);
 
             if (shouldRun)
@@ -626,6 +613,20 @@ namespace HillClimber
                 draggedPoint.Draw(spriteBatch);
             }
 
+            delete.Draw(spriteBatch);
+            clear.Draw(spriteBatch);
+            run.Draw(spriteBatch);
+            pointMaker.Draw(spriteBatch);
+
+            xLabel.Draw(spriteBatch);
+            yLabel.Draw(spriteBatch);
+            arrangementLabel.Draw(spriteBatch);
+
+            settingsBox.Draw(spriteBatch);
+            GraphicsDevice.Clear(Color.SlateGray);
+
+            indexLabel.Print(spriteBatch);
+            timeLabel.Draw(spriteBatch);
 
             spriteBatch.End();
             base.Draw(gameTime);
