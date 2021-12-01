@@ -24,7 +24,7 @@ namespace HillClimber
 
         public bool Check(Vector2 cursor, bool isClicked)
         {            
-            if (Button.check(cursor, isClicked))
+            if (Button.Check(cursor, isClicked))
             {
                 Clicked = true;
                 Label.Clear();

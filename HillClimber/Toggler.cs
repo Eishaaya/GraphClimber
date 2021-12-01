@@ -48,10 +48,10 @@ namespace HillClimber
             MovingColor.Scale2D = new Vector2((this.Ball.Location.X - Location.X) / (Image.Width - this.Ball.Image.Width), MovingColor.Scale2D.Y);
         }
       
-        public override bool check(Vector2 cursor, bool isclicked)
+        public override bool Check(Vector2 cursor, bool isclicked)
         {
             Move();
-            var tempState = base.check(cursor, isclicked);
+            var tempState = base.Check(cursor, isclicked);
             if (!hold)
             {
                 if (Done)

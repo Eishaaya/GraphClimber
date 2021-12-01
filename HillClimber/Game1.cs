@@ -11,22 +11,41 @@ namespace HillClimber
     {
         Climber climber;
 
+        enum RunType
+        {
+            Climber,
+            Dorito,
+        }
+
         bool shouldRun;
         int placements = 0;
+        RunType value = 0;
         public static Vector2 bounds = new Vector2(940, 1080);
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         List<Button> points;
+        Texture2D draggedTexture;
+        Button draggedPoint;
+        Button selectedPoint;
+
+
+        Texture2D MakeButttxt;
         Button pointMaker;
         Button clear;
         Button delete;
         Button run;
 
-        Texture2D MakeButttxt;
-        Texture2D LinearButttxt;
-        Texture2D TimeXPosButttxt;
+        ButtonLabel xLabel;
+        ButtonLabel yLabel;
+        ButtonLabel arrangementLabel;
+        ButtonLabel timeLabel;
 
-        Texture2D darkLinetxt;
+        Slider slider;
+        
+        //Texture2D LinearButttxt;
+        //Texture2D TimeXPosButttxt;
+
+        //Texture2D darkLinetxt;
 
         MouseState ms;
         KeyboardState ks;
@@ -41,13 +60,8 @@ namespace HillClimber
         float gridWidth;
         Sprite settingsBox;
 
-        Texture2D draggedTexture;
-        Button draggedPoint;
-        Button selectedPoint;
-        ButtonLabel xLabel;
-        ButtonLabel yLabel;
-        ButtonLabel arrangementLabel;
-        ButtonLabel timeLabel;
+
+
 
         Timer time = new Timer(50);
 
@@ -60,7 +74,7 @@ namespace HillClimber
 
         float newNumber;
 
-        Sprite numberLine;
+        //Sprite numberLine;        
 
         Dictionary<ButtonLabel, Func<bool>> mapping;
         Dictionary<Keys, string> keyStrings;
@@ -83,6 +97,7 @@ namespace HillClimber
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            var rightFont = Content.Load<SpriteFont>("RightFont");
             ms = new MouseState();
             ks = new KeyboardState();
             points = new List<Button>();
@@ -114,6 +129,8 @@ namespace HillClimber
 
             int lineAmount = 20;
 
+
+
             for (int i = 0; i <= lineAmount; i++)
             {
                 gridLines.Add(new ScalableSprite(Content.Load<Texture2D>("Pixel"), new Vector2(0, i * bounds.Y / lineAmount), Color.Black, 0, SpriteEffects.None, new Vector2(0, .5f), new Vector2(540, 2), 1));
@@ -126,6 +143,14 @@ namespace HillClimber
             settingsBox = new Sprite(Content.Load<Texture2D>("Box"), new Vector2(gridWidth, 47), Color.White, 0, SpriteEffects.None, Vector2.Zero, 1, 1);
             drawnLine = new Sprite(Content.Load<Texture2D>("Line"), new Vector2(-1), Color.Gold, 0, SpriteEffects.None, new Vector2(7.5f), 1, 1);
             drawnSegment = new ScalableSprite(Content.Load<Texture2D>("LineSegment"), Vector2.Zero, Color.Gold, 0, SpriteEffects.None, new Vector2(0, 7.5f), new Vector2(1));
+
+            var sliderPos = new Vector2(gridWidth + 200, settingsBox.Location.Y + settingsBox.Image.Height + 50);
+            slider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, new Vector2(20, 20), 
+                                new Sprite(Content.Load<Texture2D>("Slider"), sliderPos, new Vector2(200, 12.5f)),
+                                new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero), 2, false, rightFont, "Sussy Baka", new string[] {
+                                    "Hill Climber",
+                                    "Brain Dorito"
+                                });
 
             MakeButttxt = Content.Load<Texture2D>("MakeButton");
            // LinearButttxt = Content.Load<Texture2D>("LinearButton");
@@ -141,21 +166,21 @@ namespace HillClimber
 
             arrangementLabel = new ButtonLabel(new Button(Content.Load<Texture2D>("Short Highlight"), new Vector2(gridWidth + 259, run.Image.Height + 300),
                                                           Color.Transparent, 0, SpriteEffects.None, Vector2.Zero, 1, 1, Color.White, Color.LightGray),
-                                               new Label(Content.Load<SpriteFont>("RightFont"), Color.White, new Vector2(gridWidth + 269, run.Image.Height + 324 - 18), ""));
+                                               new Label(rightFont, Color.White, new Vector2(gridWidth + 269, run.Image.Height + 324 - 18), ""));
 
             xLabel = new ButtonLabel(new Button(Content.Load<Texture2D>("Highlight"), new Vector2(gridWidth + 50, run.Image.Height + 50),
                                                 Color.Transparent, 0, SpriteEffects.None, Vector2.Zero, 1, 1, Color.White, Color.LightGray),
-                                     new Label(Content.Load<SpriteFont>("RightFont"), Color.White, new Vector2(gridWidth + 50, run.Image.Height + 74 - 18), ""));
+                                     new Label(rightFont, Color.White, new Vector2(gridWidth + 50, run.Image.Height + 74 - 18), ""));
 
             yLabel = new ButtonLabel(new Button(Content.Load<Texture2D>("Highlight"), new Vector2(gridWidth + 50, run.Image.Height + 150),
                                                 Color.Transparent, 0, SpriteEffects.None, Vector2.Zero, 1, 1, Color.White, Color.LightGray),
-                                    new Label(Content.Load<SpriteFont>("RightFont"), Color.White, new Vector2(gridWidth + 50, run.Image.Height + 174 - 18), ""));
+                                    new Label(rightFont, Color.White, new Vector2(gridWidth + 50, run.Image.Height + 174 - 18), ""));
 
             timeLabel = new ButtonLabel(new Button(Content.Load<Texture2D>("Short Highlight"), new Vector2(gridWidth + 259, run.Image.Height + 600),
                                                           Color.Transparent, 0, SpriteEffects.None, Vector2.Zero, 1, 1, Color.White, Color.LightGray),
-                                               new Label(Content.Load<SpriteFont>("RightFont"), Color.White, new Vector2(gridWidth + 269, run.Image.Height + 624 - 18), "0.05"));
+                                               new Label(rightFont, Color.White, new Vector2(gridWidth + 269, run.Image.Height + 624 - 18), "0.05"));
 
-            indexLabel = new Label(Content.Load<SpriteFont>("RightFont"), Color.White, new Vector2(gridWidth + 272, settingsBox.Location.Y + 474 - 18), "NaN");
+            indexLabel = new Label(rightFont, Color.White, new Vector2(gridWidth + 272, settingsBox.Location.Y + 474 - 18), "NaN");
 
 
             mapping = new Dictionary<ButtonLabel, Func<bool>>()
@@ -290,7 +315,7 @@ namespace HillClimber
             #endregion
 
             #region topButtons
-            if (pointMaker.check(mousePos, mouseDown) && !prevDown)
+            if (pointMaker.Check(mousePos, mouseDown) && !prevDown)
             {
                 if (draggedPoint == null)
                 {
@@ -300,7 +325,7 @@ namespace HillClimber
                 grabbedIndex = -1;
                 prevDown = true;
             }
-            else if (delete.check(mousePos, mouseDown))
+            else if (delete.Check(mousePos, mouseDown))
             {
                 if (shouldRun)
                 {
@@ -308,18 +333,22 @@ namespace HillClimber
                 }
                 DeletePoint();
             }
-            else if (clear.check(mousePos, mouseDown))
+            else if (clear.Check(mousePos, mouseDown))
             {
                 shouldRun = false;
                 drawnPoints.Clear();
                 points.Clear();
                 indexLabel.SetText("NaN");
             }
-            else if (run.check(mousePos, mouseDown) & !prevDown)
+            else if (run.Check(mousePos, mouseDown) & !prevDown)
             {
                 shouldRun = !shouldRun;
                 RunBlock(mousePos, mouseDown, midDown, gameTime);
                 prevDown = true;
+            }
+            else if (!slider.Check(mousePos, mouseDown))
+            {
+                value = (RunType)slider.Value;
             }
 
             #endregion
@@ -562,12 +591,12 @@ namespace HillClimber
                 var point = points[i];
                 if (i != grabbedIndex || selectedPoint == null)
                 {
-                    if (point.check(mousePos, mouseDown) && !prevDown)
+                    if (point.Check(mousePos, mouseDown) && !prevDown)
                     {
                         selectedPoint = null;
                         SetDraggedPoint(mousePos, i);
                     }
-                    else if (point.check(mousePos, midDown))
+                    else if (point.Check(mousePos, midDown))
                     {
                         selectedPoint = points[i];
                         grabbedIndex = i;
@@ -625,6 +654,8 @@ namespace HillClimber
 
             indexLabel.Print(spriteBatch);
             timeLabel.Draw(spriteBatch);
+
+            slider.Draw(spriteBatch);
 
             spriteBatch.End();
             base.Draw(gameTime);
