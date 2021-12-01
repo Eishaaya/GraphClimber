@@ -584,9 +584,7 @@ namespace HillClimber
         #region drawing
         protected override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
-
-
+            spriteBatch.Begin();            
 
 
             graphBackGround.Draw(spriteBatch);
