@@ -26,8 +26,12 @@ namespace HillClimber
         }
 
         public Button(Texture2D image, Vector2 location)
-            : this(image, location, Color.White, Vector2.Zero, Color.DarkGray, Color.Gray) { }
-        public Button(Texture2D image, Vector2 location, Color color, Vector2 origin, Color hoverColor, Color clickedColor)
+            : this(image, location, Vector2.Zero) { }
+        public Button(Texture2D image, Vector2 location, Vector2 origin)
+            : this(image, location, origin, 1) { }
+        public Button(Texture2D image, Vector2 location, Vector2 origin, float scale)
+            : this(image, location, Color.White, origin, scale, Color.DarkGray, Color.Gray) { }
+        public Button(Texture2D image, Vector2 location, Color color, Vector2 origin, float scale, Color hoverColor, Color clickedColor)
             : this(image, location, color, 0, SpriteEffects.None, origin, 1, 1, hoverColor, clickedColor) { }
         public Button(Texture2D image, Vector2 location, Color color, float rotation, SpriteEffects effect, Vector2 origin, float superscale, float depth, Color hovercolor, Color clickedcolor)
             : base(image, location, color, rotation, effect, origin, superscale, depth)

@@ -15,14 +15,16 @@ namespace HillClimber
         {
             get
             {
-                return new Rectangle((int)(Location.X + Origin.X), (int)(Location.Y + Origin.Y), (int)(Image.Width * Scale), (int)(Image.Height * Scale));
+                return new Rectangle((int)(Location.X - Origin.X), (int)(Location.Y - Origin.Y), (int)(Image.Width * Scale), (int)(Image.Height * Scale));
             }
         }
 
         public Sprite(Texture2D image, Vector2 location)
             : this(image, location, Vector2.Zero) { }
         public Sprite(Texture2D image, Vector2 location, Vector2 origin)
-            : this(image, location, Color.White, 0, SpriteEffects.None, origin, 1, 1) { }
+            : this(image, location, origin, 1) { }
+        public Sprite(Texture2D image, Vector2 location, Vector2 origin, float scale)
+    : this(image, location, Color.White, 0, SpriteEffects.None, origin, scale, 1) { }
         public Sprite(Texture2D image, Vector2 location, Color color, float rotation, SpriteEffects effects, Vector2 origin, float scale, float depth)
         : base(location, color, origin, rotation, effects, scale, depth)
         {

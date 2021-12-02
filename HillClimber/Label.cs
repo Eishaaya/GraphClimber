@@ -48,6 +48,16 @@ namespace HillClimber
             Text = Math.Round(number, maxDigits).ToString();
         }
 
+        public void SetText(Vector2 coordinate, int maxDigits = 0)
+        {
+            Text = $"({Math.Round(coordinate.X, maxDigits)}, {Math.Round(coordinate.Y, maxDigits)})";
+        }
+
+        public void SetText(Rectangle box)
+        {
+            Text = $"({box.X}, {box.Y}, {box.Width}, {box.Height})";
+        }
+
         public void Clear ()
         {
             Text = "";
