@@ -10,6 +10,7 @@ namespace HillClimber
     public class Game1 : Game
     {
         Climber climber;
+        BigBrainTriangle leDorito;
 
         enum RunType
         {
@@ -93,7 +94,7 @@ namespace HillClimber
         protected override void Initialize()
         {
             //tell chris to remember the number
-            totalScale = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height / 1180f;
+            totalScale = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height / 1200f;
             bounds *= totalScale;
             graphics.PreferredBackBufferWidth = (int)bounds.X;
             graphics.PreferredBackBufferHeight = (int)bounds.Y;
@@ -155,11 +156,13 @@ namespace HillClimber
             drawnSegment = new ScalableSprite(Content.Load<Texture2D>("LineSegment"), Vector2.Zero, Color.Gold, 0, SpriteEffects.None, new Vector2(0, 7.5f), new Vector2(1));
 
             var sliderPos = new Vector2(gridWidth + 200 * totalScale, settingsBox.Location.Y + (settingsBox.Image.Height + 50) * totalScale);
-            slider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, Color.White, 0, SpriteEffects.None, new Vector2(20), 1 * totalScale, 1, Color.DarkGray, Color.Gray,
-                                new Sprite(Content.Load<Texture2D>("Slider"), sliderPos, new Vector2(200, 12.5f), totalScale),
-                                new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 2, false, rightFont, "Sussy Baka", new string[] {
+            slider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, Color.White, 0, SpriteEffects.None, new Vector2(20), .9f * totalScale, 1, Color.DarkGray, Color.Gray,
+                                new Sprite(Content.Load<Texture2D>("Slider"), sliderPos, new Vector2(200, 12.5f), .9f * totalScale),
+                                new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 4, false, rightFont, "AI Type", new string[] {
                                     "Hill Climber",
-                                    "Brain Dorito"
+                                    "Brain Dorito",
+                                    "imposter",
+                                    "france"
                                 }, 50, 10);
 
             MakeButttxt = Content.Load<Texture2D>("MakeButton");
@@ -250,16 +253,30 @@ namespace HillClimber
                 time.Tick(gameTime);
                 if (time.Ready() || time.GetMillies() == 0)
                 {
-                    climber.Update(points, gridWidth);
+                    Grapher grapher;
 
-                    var tempOffset = new Vector2(0, gridWidth / 2); ;
-                    drawnLine.Location = new Vector2(0, climber.getY(0)) * gridWidth;
+                     
+                    
+
+                    if (value == RunType.Climber)
+                    {
+                        grapher = climber;
+                    }
+                    else
+                    {
+                        grapher = leDorito;
+                    }
+
+                    grapher.Update(points, gridWidth);
+
+                    //var tempOffset = new Vector2(0, gridWidth / 2); ;
+                    drawnLine.Location = new Vector2(0, grapher.GetY(0)) * gridWidth;
                     drawnPoints.Add(drawnLine.Clone());
-                    drawnLine.Location = new Vector2(1, climber.getY(1)) * gridWidth;
+                    drawnLine.Location = new Vector2(1, grapher.GetY(1)) * gridWidth;
 
 
                     drawnSegment.Location = drawnPoints[drawnPoints.Count - 1].Location;
-                    drawnSegment.rotation = (float)Math.Atan(climber.M);
+                    drawnSegment.rotation = (float)Math.Atan(grapher.M);
                     drawnSegment.Scale2D = new Vector2(Vector2.Distance(drawnSegment.Location, drawnLine.Location), 1);
 
 
@@ -477,8 +494,14 @@ namespace HillClimber
         void RunBlock(Vector2 mousePos, bool mouseDown, bool midDown, GameTime gameTime)
         {
             climber = new Climber();
+            leDorito = new BigBrainTriangle(0, Extensions.random, 1, Error);
             CheckPoints(mousePos, mouseDown, midDown);
             drawnPoints = new List<Sprite>();
+        }
+
+        double Error (double correctOutput, double output)
+        {
+            return Math.Pow(correctOutput - output, 2);
         }
 
         void DragLogic(Vector2 mousePos, bool mouseDown)
@@ -672,8 +695,8 @@ namespace HillClimber
 
             slider.Draw(spriteBatch);
 
-            buttonSpot.Print(spriteBatch);
-            mouseSpot.Print(spriteBatch);
+            //buttonSpot.Print(spriteBatch);
+            //mouseSpot.Print(spriteBatch);
 
             //spriteBatch.Draw(run.Image, new Vector2(540, 797), Color.Red);
 

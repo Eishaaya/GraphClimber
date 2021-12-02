@@ -45,7 +45,7 @@ namespace HillClimber
             for (int i = 0; i < points.Length; i++)
             {
                 points[i] = point.Clone();
-                points[i].Location = bar.Location - new Vector2(-i * (bar.Image.Width - buffers.X * 2) * (pointCount - 1) + bar.Origin.X - buffers.X, 0) * Scale;
+                points[i].Location = bar.Location - new Vector2(-i * (bar.Image.Width - buffers.X * 2) / (pointCount - 1) + bar.Origin.X - buffers.X, 0) * Scale;
             }
 
             texts = labels;
@@ -99,10 +99,12 @@ namespace HillClimber
                 if (texts != null)
                 {
                     laby.SetText(texts[Value]);
+                    laby.Location = new Vector2(bar.Location.X - (int)laby.Font.MeasureString(laby.Text).X / 2, laby.Location.Y);
                 }
                 else if (laby != null)
                 {
                     laby.SetText(Value);
+                    laby.Location = new Vector2(bar.Location.X - (int)laby.Font.MeasureString(laby.Text).X / 2, laby.Location.Y);
                 }
                 laby.ChangeColor(Color.Yellow);
             }
@@ -126,10 +128,12 @@ namespace HillClimber
             if (texts != null)
             {
                 laby.SetText(texts[Value]);
+                laby.Location = new Vector2(bar.Location.X - (int)laby.Font.MeasureString(laby.Text).X / 2, laby.Location.Y);
             }
             else if (laby != null)
             {
                 laby.SetText(Value);
+                laby.Location = new Vector2(bar.Location.X - (int)laby.Font.MeasureString(laby.Text).X / 2, laby.Location.Y);
             }
         }
 

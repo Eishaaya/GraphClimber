@@ -15,7 +15,7 @@ namespace HillClimber
         {
             get
             {
-                return new Rectangle((int)(Location.X - Origin.X), (int)(Location.Y - Origin.Y), (int)(Image.Width * Scale), (int)(Image.Height * Scale));
+                return new Rectangle((int)(Location.X - Origin.X * Scale), (int)(Location.Y - Origin.Y * Scale), (int)(Image.Width * Scale), (int)(Image.Height * Scale));
             }
         }
 

@@ -17,13 +17,6 @@ namespace HillClimber
         public bool Hold { get; set; }
         public bool Held { get; set; }
         public bool PrevDown { get; set; }
-        public override Rectangle Hitbox
-        {
-            get
-            {
-                return new Rectangle((int)(Location.X - Origin.X), (int)(Location.Y - Origin.Y), (int)(Image.Width * Scale), (int)(Image.Height * Scale));
-            }
-        }
 
         public Button(Texture2D image, Vector2 location)
             : this(image, location, Vector2.Zero) { }
@@ -32,7 +25,7 @@ namespace HillClimber
         public Button(Texture2D image, Vector2 location, Vector2 origin, float scale)
             : this(image, location, Color.White, origin, scale, Color.DarkGray, Color.Gray) { }
         public Button(Texture2D image, Vector2 location, Color color, Vector2 origin, float scale, Color hoverColor, Color clickedColor)
-            : this(image, location, color, 0, SpriteEffects.None, origin, 1, 1, hoverColor, clickedColor) { }
+            : this(image, location, color, 0, SpriteEffects.None, origin, scale, 1, hoverColor, clickedColor) { }
         public Button(Texture2D image, Vector2 location, Color color, float rotation, SpriteEffects effect, Vector2 origin, float superscale, float depth, Color hovercolor, Color clickedcolor)
             : base(image, location, color, rotation, effect, origin, superscale, depth)
         {

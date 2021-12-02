@@ -2,14 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Perceptron
+namespace HillClimber
 {
-    class BigBrainTriangle
+    class BigBrainTriangle : Grapher
     {
+        public double M { get => nums[0]; }
+        double b { get => nums[1]; }
+
+        //double[] goal { get; } = new double[] { 0, 0 };
+
+        double[] nums = new double[2];
         double[] weights;
         double bias;
         Random aléatoire;
         double mutationLevel;
+        double currentError = int.MaxValue;
         Func<double, double, double> errorCalc;
 
         public BigBrainTriangle(double[] initialWeightValues, double initialBiasValue,
@@ -32,6 +39,53 @@ namespace Perceptron
             aléatoire = random;
         }
 
+        public float GetY(float x)
+        {
+            return (float)(M * x + b);
+        }
+
+        public void Update(List<Button> points, float scale)
+        {
+            ShiftSizeTo(points.Count);
+            var inputs = ConvertToDoubles(points, scale);
+
+            currentError = TrainDeezNuts(inputs);
+
+            nums = Compute(inputs);
+        }
+
+        static double[][] ConvertToDoubles(List<Button> points, float scale)
+        {
+            var result = new double[2][] { new double[points.Count], new double[points.Count] };
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                result[1][i] = points[i].Location.X / scale;
+                result[0][i] = points[i].Location.Y / scale;
+            }
+
+            return result;
+        }
+
+        public void ShiftSizeTo(int length)
+        {
+            if (length <= weights.Length) return;
+
+            double[] newWeights = new double[length];
+            currentError = int.MaxValue;
+
+            for (int i = 0; i < Math.Min(weights.Length, length); i++)
+            {
+                newWeights[i] = weights[i];
+            }
+            for (int i = weights.Length; i < newWeights.Length; i++)
+            {
+                newWeights[i] = aléatoire.NextDouble() * mutationLevel;
+            }
+
+            weights = newWeights;
+        }
+
         public void Randomize(Random random, double min, double max)
         { /*Randomly generates values for every weight including the bias*/
             double range = max - min;
@@ -39,7 +93,7 @@ namespace Perceptron
             {
                 weights[i] = random.NextDouble() * range;
             }
-            bias = random.NextDouble() * range;            
+            bias = random.NextDouble() * range;
         }
 
         public double Compute(double[] inputs)
@@ -64,22 +118,24 @@ namespace Perceptron
             return results;
         }
 
-        public double GetError(double[][] inputs, double[] desiredOutputs)
+        public double GetError(double[][] inputs)
         {
             double error = 0;
-            double[] output = Compute(inputs);
+            nums = Compute(inputs);
 
-            for (int i = 0; i < output.Length; i++)
+            for (int i = 0; i < inputs[0].Length; i++)
             {
-                error += errorCalc(output[i], desiredOutputs[i]);
+                var outPutY = GetY((float)inputs[0][i]);
+                var realOutput = inputs[1][i];
+                error += errorCalc(realOutput, outPutY);
             }
 
-            error /= output.Length;
+            error /= inputs[0].Length;
             return error;
         }
 
-        public double TrainDeezNuts(double[][] inputs, double[] desiredOutputs, double currentError)
-        {           
+        public double TrainDeezNuts(double[][] inputs)
+        {
             var randIndex = aléatoire.Next(weights.Length + 1);
             ref double poidsMuté = ref bias;
             if (randIndex != weights.Length)
@@ -90,7 +146,7 @@ namespace Perceptron
             var mutation = aléatoire.NextDouble() * (aléatoire.Next(0, 2) != 0 ? mutationLevel : -mutationLevel);
             poidsMuté += mutation;
 
-            var newError = GetError(inputs, desiredOutputs);
+            var newError = GetError(inputs);
 
             if (newError > currentError)
             {

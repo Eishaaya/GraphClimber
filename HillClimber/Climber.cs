@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HillClimber
 {
-    class Climber
+    class Climber : Grapher
     {
         Random random = Extensions.random;
         public double M { get => nums[0]; }
@@ -22,7 +22,7 @@ namespace HillClimber
             nums[1] = 0;
         }
 
-        public float getY(float x)
+        public float GetY(float x)
         {
             return (float)(M * x + b);
         }
