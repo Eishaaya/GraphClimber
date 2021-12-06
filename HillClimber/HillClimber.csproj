@@ -44,9 +44,11 @@
     <Compile Include="AnimatingSprite.cs" />
     <Compile Include="BezierFuncs.cs" />
     <Compile Include="BigBrainTriangle.cs" />
+    <Compile Include="BigBrainTriangleTest.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="ButtonLabel.cs" />
     <Compile Include="Climber.cs" />
+    <Compile Include="DoritoGrapher.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FrameObject.cs" />

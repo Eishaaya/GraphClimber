@@ -4,19 +4,12 @@ using System.Text;
 
 namespace HillClimber
 {
-    class BigBrainTriangle : Grapher
+    class BigBrainTriangle
     {
-        public double M { get => nums[0]; }
-        double b { get => nums[1]; }
-
-        //double[] goal { get; } = new double[] { 0, 0 };
-
-        double[] nums = new double[2];
         double[] weights;
         double bias;
         Random aléatoire;
         double mutationLevel;
-        double currentError = int.MaxValue;
         Func<double, double, double> errorCalc;
 
         public BigBrainTriangle(double[] initialWeightValues, double initialBiasValue,
@@ -39,53 +32,6 @@ namespace HillClimber
             aléatoire = random;
         }
 
-        public float GetY(float x)
-        {
-            return (float)(M * x + b);
-        }
-
-        public void Update(List<Button> points, float scale)
-        {
-            ShiftSizeTo(points.Count);
-            var inputs = ConvertToDoubles(points, scale);
-
-            currentError = TrainDeezNuts(inputs);
-
-            nums = Compute(inputs);
-        }
-
-        static double[][] ConvertToDoubles(List<Button> points, float scale)
-        {
-            var result = new double[2][] { new double[points.Count], new double[points.Count] };
-
-            for (int i = 0; i < points.Count; i++)
-            {
-                result[1][i] = points[i].Location.X / scale;
-                result[0][i] = points[i].Location.Y / scale;
-            }
-
-            return result;
-        }
-
-        public void ShiftSizeTo(int length)
-        {
-            if (length <= weights.Length) return;
-
-            double[] newWeights = new double[length];
-            currentError = int.MaxValue;
-
-            for (int i = 0; i < Math.Min(weights.Length, length); i++)
-            {
-                newWeights[i] = weights[i];
-            }
-            for (int i = weights.Length; i < newWeights.Length; i++)
-            {
-                newWeights[i] = aléatoire.NextDouble() * mutationLevel;
-            }
-
-            weights = newWeights;
-        }
-
         public void Randomize(Random random, double min, double max)
         { /*Randomly generates values for every weight including the bias*/
             double range = max - min;
@@ -93,7 +39,7 @@ namespace HillClimber
             {
                 weights[i] = random.NextDouble() * range;
             }
-            bias = random.NextDouble() * range;
+            bias = random.NextDouble() * range;            
         }
 
         public double Compute(double[] inputs)
@@ -118,24 +64,40 @@ namespace HillClimber
             return results;
         }
 
-        public double GetError(double[][] inputs)
+        public double GetError(double[][] inputs, Func<double, double, double, double> GetY, double bOrM)
         {
             double error = 0;
-            nums = Compute(inputs);
+            double output = Compute(inputs[0]);
 
-            for (int i = 0; i < inputs[0].Length; i++)
+            for (int i = 0; i < inputs.Length; i++)
             {
-                var outPutY = GetY((float)inputs[0][i]);
-                var realOutput = inputs[1][i];
-                error += errorCalc(realOutput, outPutY);
-            }
-
-            error /= inputs[0].Length;
+                var gottenY = GetY(inputs[0][i], output, bOrM);
+                error += errorCalc(gottenY, inputs[1][i]);
+            }            
             return error;
         }
 
-        public double TrainDeezNuts(double[][] inputs)
+        public bool ShiftSizeTo(int length)
         {
+            if (length <= weights.Length) return false;
+
+            double[] newWeights = new double[length];            
+
+            for (int i = 0; i < Math.Min(weights.Length, length); i++)
+            {
+                newWeights[i] = weights[i];
+            }
+            for (int i = weights.Length; i < newWeights.Length; i++)
+            {
+                newWeights[i] = aléatoire.NextDouble() * mutationLevel;
+            }
+
+            weights = newWeights;
+            return true;
+        }
+
+        public double TrainDeezNuts(double[][] inputs, Func<double, double, double, double> GetY, double bOrM, double currentError)
+        {           
             var randIndex = aléatoire.Next(weights.Length + 1);
             ref double poidsMuté = ref bias;
             if (randIndex != weights.Length)
@@ -146,7 +108,7 @@ namespace HillClimber
             var mutation = aléatoire.NextDouble() * (aléatoire.Next(0, 2) != 0 ? mutationLevel : -mutationLevel);
             poidsMuté += mutation;
 
-            var newError = GetError(inputs);
+            var newError = GetError(inputs, GetY, bOrM);
 
             if (newError > currentError)
             {

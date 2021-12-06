@@ -10,7 +10,8 @@ namespace HillClimber
     public class Game1 : Game
     {
         Climber climber;
-        BigBrainTriangle leDorito;
+        //BigBrainTriangleTest leDorito;
+        DoritoGrapher leDorito;
 
         enum RunType
         {
@@ -494,7 +495,7 @@ namespace HillClimber
         void RunBlock(Vector2 mousePos, bool mouseDown, bool midDown, GameTime gameTime)
         {
             climber = new Climber();
-            leDorito = new BigBrainTriangle(0, Extensions.random, 1, Error);
+            leDorito = new BigBrainTriangleTest(0, Extensions.random, 1, Error);
             CheckPoints(mousePos, mouseDown, midDown);
             drawnPoints = new List<Sprite>();
         }
