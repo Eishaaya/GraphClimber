@@ -11,6 +11,7 @@ namespace HillClimber
         Random aléatoire;
         double mutationLevel;
         Func<double, double, double> errorCalc;
+        int oldSize = 0;
 
         public BigBrainTriangle(double[] initialWeightValues, double initialBiasValue,
             double mutationSize, Random random, Func<double, double, double> err)
@@ -69,7 +70,7 @@ namespace HillClimber
             double error = 0;
             double output = Compute(inputs[0]);
 
-            for (int i = 0; i < inputs.Length; i++)
+            for (int i = 0; i < inputs[0].Length; i++)
             {
                 var gottenY = GetY(inputs[0][i], output, bOrM);
                 error += errorCalc(gottenY, inputs[1][i]);
@@ -79,8 +80,10 @@ namespace HillClimber
 
         public bool ShiftSizeTo(int length)
         {
-            if (length <= weights.Length) return false;
-
+            var olderSize = oldSize;
+            oldSize = length;            
+            if (length <= olderSize) return length < olderSize;
+            
             double[] newWeights = new double[length];            
 
             for (int i = 0; i < Math.Min(weights.Length, length); i++)

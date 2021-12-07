@@ -16,10 +16,12 @@ namespace HillClimber
 
         double[] nums = new double[2];
 
+        bool cleared = false;
+
         public Climber()
         {
             nums[0] = 0;
-            nums[1] = 0;
+            nums[1] = 0;            
         }
 
         public float GetY(float x)
@@ -27,8 +29,21 @@ namespace HillClimber
             return (float)(M * x + b);
         }
 
+        public void Clear()
+        {
+            nums[0] = 0;
+            nums[1] = 0;
+            cleared = true;
+        }
+
         public void Update(List<Button> spots, float scale)
         {
+            if (cleared)
+            {
+                cleared = false;
+                return;
+            }
+
             var points = new Vector2[spots.Count];
             for (int i = 0; i < spots.Count; i++)
             {

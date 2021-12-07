@@ -9,10 +9,11 @@ namespace HillClimber
     class DoritoGrapher : Grapher
     {
         Random aléatoire = Extensions.random;
-        double[] blank { get; } = new double[] { 0, 0 };
+        //double[] blank { get; } = new double[] { 0, 0 };
         BigBrainTriangle slope;
         BigBrainTriangle offset;
         Func<double, double, double> errorCalc;
+        double mutationPower;
 
         double currentError = int.MaxValue;
 
@@ -20,26 +21,40 @@ namespace HillClimber
         double b;
 
 
+        public DoritoGrapher (int inputCount, int mutationLevel, Func<double, double, double> error)
+        {
+            slope = new BigBrainTriangle(inputCount, aléatoire, mutationLevel, error);
+            offset = new BigBrainTriangle(inputCount, aléatoire, mutationLevel, error);
+            errorCalc = error;
+            currentError = int.MaxValue;
+        }
+
+        public void Clear()
+        {
+            slope.Randomize(aléatoire, -mutationPower, mutationPower);
+            offset.Randomize(aléatoire, -mutationPower, mutationPower);
+            currentError = int.MaxValue;
+        }
+
         public void Update(List<Button> points, float scale)
         {       
             var inputs = ConvertToDoubles(points, scale);
 
+            bool different = slope.ShiftSizeTo(points.Count) && offset.ShiftSizeTo(points.Count);
+
             M = slope.Compute(inputs[0]);
             b = offset.Compute(inputs[0]);
 
-            double slopeError;
-            double offError;
 
-            if (slope.ShiftSizeTo(points.Count) && offset.ShiftSizeTo(points.Count))
+            if (different)
             {
-                slopeError = slope.GetError(inputs, GetYForM, b);
-                offError = offset.GetError(inputs, GetYForB, M);
-                currentError = slopeError * offError / 2;
+                slope.GetError(inputs, GetYForM, b);
+                currentError = offset.GetError(inputs, GetYForB, M);
             }
 
-            slopeError = slope.TrainDeezNuts(inputs, GetYForM, b, currentError);
-            offError = offset.TrainDeezNuts(inputs, GetYForB, M, currentError);
-            currentError = slopeError * offError / 2;
+            currentError = slope.TrainDeezNuts(inputs, GetYForM, b, currentError);
+            currentError = offset.TrainDeezNuts(inputs, GetYForB, M, currentError);
+            //currentError = slopeError * offError / 2;
         }
 
         static double[][] ConvertToDoubles(List<Button> points, float scale)
@@ -48,8 +63,8 @@ namespace HillClimber
 
             for (int i = 0; i < points.Count; i++)
             {
-                result[1][i] = points[i].Location.X / scale;
-                result[0][i] = points[i].Location.Y / scale;
+                result[0][i] = points[i].Location.X / scale * 100;
+                result[1][i] = points[i].Location.Y / scale * 100;
             }
 
             return result;
@@ -57,7 +72,7 @@ namespace HillClimber
 
         public float GetY(float x)
         {
-            return (float)(M * x + b);
+            return (float)(M * x + b / 100);
         }
 
         public static double GetYForM(double x, double m, double b)

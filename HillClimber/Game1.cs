@@ -17,7 +17,9 @@ namespace HillClimber
         {
             Climber,
             Dorito,
+            Reset
         }
+        Grapher grapher;
 
         bool shouldRun;
         int placements = 0;
@@ -162,7 +164,7 @@ namespace HillClimber
                                 new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 4, false, rightFont, "AI Type", new string[] {
                                     "Hill Climber",
                                     "Brain Dorito",
-                                    "imposter",
+                                    "Reset",
                                     "france"
                                 }, 50, 10);
 
@@ -254,7 +256,7 @@ namespace HillClimber
                 time.Tick(gameTime);
                 if (time.Ready() || time.GetMillies() == 0)
                 {
-                    Grapher grapher;
+                    
 
                      
                     
@@ -263,9 +265,13 @@ namespace HillClimber
                     {
                         grapher = climber;
                     }
-                    else
+                    else if (value == RunType.Dorito)
                     {
                         grapher = leDorito;
+                    }
+                    else if (value == RunType.Reset)
+                    {
+                        grapher.Clear();
                     }
 
                     grapher.Update(points, gridWidth);
@@ -495,7 +501,10 @@ namespace HillClimber
         void RunBlock(Vector2 mousePos, bool mouseDown, bool midDown, GameTime gameTime)
         {
             climber = new Climber();
-            leDorito = new BigBrainTriangleTest(0, Extensions.random, 1, Error);
+            if (leDorito == null)
+            {
+                leDorito = new DoritoGrapher(points.Count, 1, Error);
+            }
             CheckPoints(mousePos, mouseDown, midDown);
             drawnPoints = new List<Sprite>();
         }
