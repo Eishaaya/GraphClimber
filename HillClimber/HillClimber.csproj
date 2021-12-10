@@ -61,6 +61,7 @@
     <Compile Include="ScalableSprite.cs" />
     <Compile Include="Slider.cs" />
     <Compile Include="Sprite.cs" />
+    <Compile Include="SupportingTortillaFuncs.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="Toggler.cs" />
     <Compile Include="VisualObject.cs" />
