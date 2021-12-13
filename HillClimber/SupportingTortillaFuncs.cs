@@ -15,7 +15,7 @@ namespace HillClimber
             this.function = function;
             this.derivative = derivative;
         }
-
+        
         public double Function(double input)
         {
             return function(input);
@@ -27,6 +27,11 @@ namespace HillClimber
         }
 
         #region funcs
+
+        public static double Identity(double input)
+        {
+            return input;
+        }
         public static double BinaryStep(double input)
         {
             return input < 0 ? 0 : 1;
@@ -49,9 +54,14 @@ namespace HillClimber
         #endregion
 
         #region derivs
-        public static double BinaryDeriv(double input)
+
+        public static double IdentityDeriv(double input)
         {
             return 1;
+        }
+        public static double BinaryDeriv(double input)
+        {
+            return input == 0? double.NaN : 0;
         }
         public static double SigDeriv(double input)
         {

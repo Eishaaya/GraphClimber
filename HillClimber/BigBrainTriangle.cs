@@ -11,26 +11,45 @@ namespace HillClimber
         Random aléatoire;
         double mutationLevel;
         Func<double, double, double> errorCalc;
+        ActivationFunction filterButNot;
         int oldSize = 0;
 
         public BigBrainTriangle(double[] initialWeightValues, double initialBiasValue,
-            double mutationSize, Random random, Func<double, double, double> err)
+            double mutationSize, Random random, Func<double, double, double> err, ActivationFunction filter = null)
         { /*initializes the weights array and bias*/
             weights = initialWeightValues;
             bias = initialBiasValue;
             aléatoire = random;
             mutationLevel = mutationSize;
             errorCalc = err;
+
+            if (filter != null)
+            {
+                filterButNot = filter;
+            }
+            else
+            {
+                filterButNot = new ActivationFunction(ActivationFunction.Identity, ActivationFunction.IdentityDeriv);
+            }
         }
 
         public BigBrainTriangle(int amountOfInputs, Random random, double mutationAmount,
-            Func<double, double, double> err)
+            Func<double, double, double> err, ActivationFunction filter = null)
         { /*Initializes the weights array given the amount of inputs*/
             weights = new double[amountOfInputs];
             Randomize(random, -mutationAmount, mutationAmount);
             errorCalc = err;
             mutationLevel = mutationAmount;
             aléatoire = random;
+
+            if (filter != null)
+            {
+                filterButNot = filter;
+            }
+            else
+            {
+                filterButNot = new ActivationFunction(ActivationFunction.Identity, ActivationFunction.IdentityDeriv);
+            }
         }
 
         public void Randomize(Random random, double min, double max)
@@ -50,7 +69,8 @@ namespace HillClimber
             {
                 sum += inputs[i] * weights[i];
             }
-            return sum + bias;
+            sum /= inputs.Length;
+            return filterButNot.Function(sum + bias);
             //return 4;
         }
 
