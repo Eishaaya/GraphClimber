@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HillClimber
 {
-    interface Grapher
+    interface IGrapher
     {
         void Update(List<Button> points, float scaler);
         void Clear();

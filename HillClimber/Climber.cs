@@ -8,20 +8,24 @@ using System.Threading.Tasks;
 
 namespace HillClimber
 {
-    class Climber : Grapher
+    class Climber : IGrapher
     {
         Random random = Extensions.random;
         public double M { get => nums[0]; }
-        double b { get => nums[1]; }
+        protected double b { get => nums[1]; }
 
-        double[] nums = new double[2];
+        protected double[] nums = new double[2];
 
-        bool cleared = false;
+        protected bool cleared = false;
 
-        public Climber()
+        protected Func<double, double, double> errorFunc;
+
+        public Climber(Func<double, double, double> error)
         {
             nums[0] = 0;
-            nums[1] = 0;            
+            nums[1] = 0;
+
+            errorFunc = error;
         }
 
         public float GetY(float x)
@@ -51,7 +55,7 @@ namespace HillClimber
             }
             Update(points);
         }
-        void Update(Vector2[] points)
+        protected void Update(Vector2[] points)
         {
             var oldNums = (double[])nums.Clone();
             Mutate();
@@ -61,21 +65,21 @@ namespace HillClimber
                 nums = oldNums;
             }
         }
-        void Mutate()
+        protected virtual void Mutate()
         {
             ref var num = ref nums[random.Next(0, nums.Length)];
 
-            //adding a random between 0 & 1, then multiplying it sometimes with -1
+            //adding a random between 0 & 1, then multiplying it half the time with -1
             num += random.NextDouble() * (double)(random.Next(0, 2) == 0? 1 : -1);
         }
-        bool Error(double[] oldNums, Vector2[] points)
+        protected bool Error(double[] oldNums, Vector2[] points)
         {
-            float error = 0;
-            float oldError = 0;
+            double error = 0;
+            double oldError = 0;
             foreach (var point in points)
             {
-                error += MathHelper.Distance(point.Y, (float)(point.X * M + b));
-                oldError += MathHelper.Distance(point.Y, (float)(point.X * oldNums[0] + oldNums[1]));
+                error += errorFunc(point.Y, (point.X * M + b));
+                oldError += errorFunc(point.Y, (float)(point.X * oldNums[0] + oldNums[1]));
             }
             return oldError < error;
         }

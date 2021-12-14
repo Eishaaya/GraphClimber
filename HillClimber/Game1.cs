@@ -37,9 +37,9 @@ namespace HillClimber
 
         TrainAndThinkTypes aiType = TrainAndThinkTypes.Climber | TrainAndThinkTypes.None;
 
-        Dictionary<TrainAndThinkTypes, Grapher> graphers;
+        Dictionary<TrainAndThinkTypes, IGrapher> graphers;
 
-        Grapher grapher;
+        IGrapher grapher;
 
         bool shouldRun;
         int placements = 0;
@@ -258,7 +258,7 @@ namespace HillClimber
             //Func<int, int, int> sumFunction = mapping[0];
             //sumFunction(5, 5);
 
-            graphers = new Dictionary<TrainAndThinkTypes, Grapher>()
+            graphers = new Dictionary<TrainAndThinkTypes, IGrapher>()
             {
                 { TrainAndThinkTypes.None | TrainAndThinkTypes.Climber, climber },
                 { TrainAndThinkTypes.None | TrainAndThinkTypes.Faller, climber },
@@ -529,18 +529,22 @@ namespace HillClimber
 
         void RunBlock(Vector2 mousePos, bool mouseDown, bool midDown, GameTime gameTime)
         {
-            graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.None] = new Climber();
+            graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.None] = new Climber(AbsoluteError);
             if (graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] == null)
             {
-                graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] = new DoritoGrapher(points.Count, 1, Error);
+                graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] = new DoritoGrapher(points.Count, 1, SquaredError);
             }
             CheckPoints(mousePos, mouseDown, midDown);
             drawnPoints = new List<Sprite>();
         }
 
-        double Error(double correctOutput, double output)
+        double SquaredError(double correctOutput, double output)
         {
             return Math.Pow(correctOutput - output, 2);
+        }
+        double AbsoluteError(double correctOutput, double output)
+        {
+            return Math.Abs(correctOutput - output);
         }
 
         void DragLogic(Vector2 mousePos, bool mouseDown)

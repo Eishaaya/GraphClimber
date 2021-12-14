@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HillClimber
 {
-    class DoritoGrapher : Grapher
+    class DoritoGrapher : IGrapher
     {
         Random aléatoire = Extensions.random;
         //double[] blank { get; } = new double[] { 0, 0 };

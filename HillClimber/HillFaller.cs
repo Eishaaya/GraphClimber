@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace HillClimber
 {
-    class HillFaller
+    class HillFaller : Climber
     {
+        //protected override void Mutate()
+        public HillFaller(Func<double, double, double> error)
+           : base(error) { }
     }
 }
