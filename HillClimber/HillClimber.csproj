@@ -54,6 +54,7 @@
     <Compile Include="FrameObject.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Grapher.cs" />
+    <Compile Include="HillFaller.cs" />
     <Compile Include="Label.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Program.cs" />

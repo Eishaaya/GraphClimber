@@ -13,17 +13,36 @@ namespace HillClimber
         //BigBrainTriangleTest leDorito;
         DoritoGrapher leDorito;
 
-        enum RunType
+        //public enum TrainType
+        //{
+        //    Climber,
+        //    Faller
+        //}
+        //public enum ThinkType
+        //{
+        //    None,
+        //    Dorito,
+           
+        //}
+
+        [Flags]
+        public enum TrainAndThinkTypes : byte
         {
-            Climber,
-            Dorito,
-            Reset
+            Climber = 1,
+            Faller = 2,
+
+            None = 1 << 4,
+            Dorito = 2 << 4            
         }
+
+        TrainAndThinkTypes aiType = TrainAndThinkTypes.Climber | TrainAndThinkTypes.None;
+
+        Dictionary<TrainAndThinkTypes, Grapher> graphers;
+
         Grapher grapher;
 
         bool shouldRun;
         int placements = 0;
-        RunType value = 0;
         float totalScale;
         public static Vector2 bounds = new Vector2(940, 1080);
         GraphicsDeviceManager graphics;
@@ -39,13 +58,16 @@ namespace HillClimber
         Button clear;
         Button delete;
         Button run;
+        Button reset;
 
         ButtonLabel xLabel;
         ButtonLabel yLabel;
         ButtonLabel arrangementLabel;
         ButtonLabel timeLabel;
 
-        Slider slider;
+        Slider trainingSlider;
+        Slider thinkingSlider;
+
 
         //Texture2D LinearButttxt;
         //Texture2D TimeXPosButttxt;
@@ -158,15 +180,23 @@ namespace HillClimber
             drawnLine = new Sprite(Content.Load<Texture2D>("Line"), new Vector2(-1), Color.Gold, 0, SpriteEffects.None, new Vector2(7.5f), 1 * totalScale, 1);
             drawnSegment = new ScalableSprite(Content.Load<Texture2D>("LineSegment"), Vector2.Zero, Color.Gold, 0, SpriteEffects.None, new Vector2(0, 7.5f), new Vector2(1));
 
-            var sliderPos = new Vector2(gridWidth + 200 * totalScale, settingsBox.Location.Y + (settingsBox.Image.Height + 50) * totalScale);
-            slider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, Color.White, 0, SpriteEffects.None, new Vector2(20), .9f * totalScale, 1, Color.DarkGray, Color.Gray,
+            var sliderPos = new Vector2(gridWidth + 200 * totalScale, settingsBox.Location.Y + (settingsBox.Image.Height + 30) * totalScale);
+            trainingSlider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, Color.White, 0, SpriteEffects.None, new Vector2(20), .9f * totalScale, 1, Color.DarkGray, Color.Gray,
                                 new Sprite(Content.Load<Texture2D>("Slider"), sliderPos, new Vector2(200, 12.5f), .9f * totalScale),
-                                new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 4, false, rightFont, "AI Type", new string[] {
+                                new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 3, false, rightFont, "Trainer Type", new string[] {
                                     "Hill Climber",
-                                    "Brain Dorito",
-                                    "Reset",
+                                    "Hill Faller",
                                     "france"
                                 }, 50, 10);
+            sliderPos = new Vector2(sliderPos.X, sliderPos.Y + 120);
+            thinkingSlider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, Color.White, 0, SpriteEffects.None, new Vector2(20), .9f * totalScale, 1, Color.DarkGray, Color.Gray,
+                    new Sprite(Content.Load<Texture2D>("Slider"), sliderPos, new Vector2(200, 12.5f), .9f * totalScale),
+                    new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 2, false, rightFont, "AI Type", new string[] {
+                                    "None",
+                                    "Dorito",                                    
+                    }, 50, 10);
+
+            reset = new Button(Content.Load<Texture2D>("RedButton"), new Vector2(sliderPos.X, sliderPos.Y + 130), Color.White, new Vector2(21, 21.5f), 1, Color.IndianRed, Color.Gray);
 
             MakeButttxt = Content.Load<Texture2D>("MakeButton");
             // LinearButttxt = Content.Load<Texture2D>("LinearButton");
@@ -227,6 +257,16 @@ namespace HillClimber
 
             //Func<int, int, int> sumFunction = mapping[0];
             //sumFunction(5, 5);
+
+            graphers = new Dictionary<TrainAndThinkTypes, Grapher>()
+            {
+                { TrainAndThinkTypes.None | TrainAndThinkTypes.Climber, climber },
+                { TrainAndThinkTypes.None | TrainAndThinkTypes.Faller, climber },
+
+                { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Climber, leDorito },
+                { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Faller, leDorito },
+            };
+            aiType = TrainAndThinkTypes.None | TrainAndThinkTypes.Climber;
         }
 
         protected override void UnloadContent()
@@ -256,24 +296,7 @@ namespace HillClimber
                 time.Tick(gameTime);
                 if (time.Ready() || time.GetMillies() == 0)
                 {
-                    
-
-                     
-                    
-
-                    if (value == RunType.Climber)
-                    {
-                        grapher = climber;
-                    }
-                    else if (value == RunType.Dorito)
-                    {
-                        grapher = leDorito;
-                    }
-                    else if (value == RunType.Reset)
-                    {
-                        grapher.Clear();
-                    }
-
+                    grapher = graphers[aiType];
                     grapher.Update(points, gridWidth);
 
                     //var tempOffset = new Vector2(0, gridWidth / 2); ;
@@ -296,7 +319,7 @@ namespace HillClimber
             #endregion
 
             #region selectionSettings
-            if (slider.Done)
+            if (trainingSlider.Done)
             {
                 if (timeLabel.Clicked || timeLabel.Check(mousePos, mouseDown))
                 {
@@ -354,10 +377,16 @@ namespace HillClimber
             #endregion
 
             #region topButtons
-            if (!slider.Check(mousePos, mouseDown) && slider.Done)
+            
+            
+            if (!trainingSlider.Check(mousePos, mouseDown) && trainingSlider.Done | !thinkingSlider.Check(mousePos, mouseDown) && thinkingSlider.Done)
             {
-                value = (RunType)slider.Value;
-                if (pointMaker.Check(mousePos, mouseDown) && !prevDown)
+                aiType = (TrainAndThinkTypes)(trainingSlider.Value + 1) | (TrainAndThinkTypes)((thinkingSlider.Value + 1) << 4);
+                if (reset.Check(mousePos, mouseDown) && grapher != null)
+                {
+                    grapher.Clear();
+                }
+                else if (pointMaker.Check(mousePos, mouseDown) && !prevDown)
                 {
                     if (draggedPoint == null)
                     {
@@ -500,16 +529,16 @@ namespace HillClimber
 
         void RunBlock(Vector2 mousePos, bool mouseDown, bool midDown, GameTime gameTime)
         {
-            climber = new Climber();
-            if (leDorito == null)
+            graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.None] = new Climber();
+            if (graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] == null)
             {
-                leDorito = new DoritoGrapher(points.Count, 1, Error);
+                graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] = new DoritoGrapher(points.Count, 1, Error);
             }
             CheckPoints(mousePos, mouseDown, midDown);
             drawnPoints = new List<Sprite>();
         }
 
-        double Error (double correctOutput, double output)
+        double Error(double correctOutput, double output)
         {
             return Math.Pow(correctOutput - output, 2);
         }
@@ -703,8 +732,9 @@ namespace HillClimber
             indexLabel.Print(spriteBatch);
             timeLabel.Draw(spriteBatch);
 
-            slider.Draw(spriteBatch);
-
+            trainingSlider.Draw(spriteBatch);
+            thinkingSlider.Draw(spriteBatch);
+            reset.Draw(spriteBatch);
             //buttonSpot.Print(spriteBatch);
             //mouseSpot.Print(spriteBatch);
 
