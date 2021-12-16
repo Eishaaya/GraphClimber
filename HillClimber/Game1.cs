@@ -9,9 +9,11 @@ namespace HillClimber
 {
     public class Game1 : Game
     {
+        bool changed = false;
         Climber climber;
         //BigBrainTriangleTest leDorito;
         DoritoGrapher leDorito;
+        DoritoGrapher génieDorito;
 
         HillFaller faller;
 
@@ -260,15 +262,19 @@ namespace HillClimber
             //Func<int, int, int> sumFunction = mapping[0];
             //sumFunction(5, 5);
 
+            leDorito = new DoritoGrapher(points.Count, 1, SquaredError, new ClimbTrainer(SquaredDeriv));
+            génieDorito = new DoritoGrapher(points.Count, 1, SquaredError, new FallTrainer(SquaredDeriv));
+
             graphers = new Dictionary<TrainAndThinkTypes, IGrapher>()
             {
                 { TrainAndThinkTypes.None | TrainAndThinkTypes.Climber, climber },
                 { TrainAndThinkTypes.None | TrainAndThinkTypes.Faller, faller },
 
                 { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Climber, leDorito },
-                { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Faller, leDorito },
+                { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Faller, génieDorito },
             };
             aiType = TrainAndThinkTypes.None | TrainAndThinkTypes.Climber;
+            changed = false;
         }
 
         protected override void UnloadContent()
@@ -299,7 +305,7 @@ namespace HillClimber
                 if (time.Ready() || time.GetMillies() == 0)
                 {
                     grapher = graphers[aiType];
-                    grapher.Update(points, gridWidth);
+                    grapher.Update(points, changed, gridWidth);
 
                     //var tempOffset = new Vector2(0, gridWidth / 2); ;
                     drawnLine.Location = new Vector2(0, grapher.GetY(0)) * gridWidth;
@@ -456,6 +462,7 @@ namespace HillClimber
             {
                 if (grabbedIndex >= 0)
                 {
+                    changed = true;
                     points.RemoveAt(grabbedIndex);
                 }
                 draggedPoint = null;
@@ -464,6 +471,7 @@ namespace HillClimber
             }
             else if (selectedPoint != null)
             {
+                changed = true;
                 points.RemoveAt(grabbedIndex);
                 selectedPoint = null;
                 grabbedIndex = -1;
@@ -472,6 +480,7 @@ namespace HillClimber
 
         void PlacePoint()
         {
+            changed = true;
             if (draggedPoint.Location.X > gridWidth || draggedPoint.Location.X < 0 || draggedPoint.Location.Y > bounds.Y || draggedPoint.Location.Y < 0)
             {
                 return;
@@ -533,10 +542,6 @@ namespace HillClimber
         {
             graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.None] = new Climber(AbsoluteError);
             graphers[TrainAndThinkTypes.Faller | TrainAndThinkTypes.None] = new HillFaller(SquaredError, SquaredDeriv);
-            if (graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] == null)
-            {
-                graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] = new DoritoGrapher(points.Count, 1, SquaredError);
-            }
             CheckPoints(mousePos, mouseDown, midDown);
             drawnPoints = new List<Sprite>();
         }

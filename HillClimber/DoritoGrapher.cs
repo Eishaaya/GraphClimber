@@ -21,10 +21,10 @@ namespace HillClimber
         double b;
 
 
-        public DoritoGrapher (int inputCount, int mutationLevel, Func<double, double, double> error)
+        public DoritoGrapher (int inputCount, int mutationLevel, Func<double, double, double> error, ITrainer trainer)
         {
-            slope = new BigBrainTriangle(inputCount, aléatoire, mutationLevel, error);
-            offset = new BigBrainTriangle(inputCount, aléatoire, mutationLevel, error);
+            slope = new BigBrainTriangle(inputCount, aléatoire, mutationLevel, error, trainer);
+            offset = new BigBrainTriangle(inputCount, aléatoire, mutationLevel, error, trainer);
             errorCalc = error;
             currentError = int.MaxValue;
         }
@@ -36,11 +36,11 @@ namespace HillClimber
             currentError = int.MaxValue;
         }
 
-        public void Update(List<Button> points, float scale)
+        public void Update(List<Button> points, bool edited, float scale)
         {       
             var inputs = ConvertToDoubles(points, scale);
 
-            bool different = slope.ShiftSizeTo(points.Count) && offset.ShiftSizeTo(points.Count);
+            bool different = edited | (slope.ShiftSizeTo(points.Count) && offset.ShiftSizeTo(points.Count));
 
             M = slope.Compute(inputs[0]);
             b = offset.Compute(inputs[0]);

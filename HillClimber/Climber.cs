@@ -42,7 +42,7 @@ namespace HillClimber
             cleared = true;
         }
 
-        public void Update(List<Button> spots, float scale)
+        public void Update(List<Button> spots, bool changed, float scale)
         {
             if (cleared)
             {

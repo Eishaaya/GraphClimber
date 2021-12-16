@@ -11,17 +11,20 @@ namespace HillClimber
         Random aléatoire;
         double mutationLevel;
         Func<double, double, double> errorCalc;
+        Func<double, double> errorDeriv;
         ActivationFunction filterButNot;
         int oldSize = 0;
+        ITrainer trainer;
 
         public BigBrainTriangle(double[] initialWeightValues, double initialBiasValue,
-            double mutationSize, Random random, Func<double, double, double> err, ActivationFunction filter = null)
+            double mutationSize, Random random, Func<double, double, double> err, ITrainer trainer, ActivationFunction filter = null)
         { /*initializes the weights array and bias*/
             weights = initialWeightValues;
             bias = initialBiasValue;
             aléatoire = random;
             mutationLevel = mutationSize;
             errorCalc = err;
+            this.trainer = trainer;
 
             if (filter != null)
             {
@@ -34,13 +37,14 @@ namespace HillClimber
         }
 
         public BigBrainTriangle(int amountOfInputs, Random random, double mutationAmount,
-            Func<double, double, double> err, ActivationFunction filter = null)
+            Func<double, double, double> err, ITrainer trainer, ActivationFunction filter = null)
         { /*Initializes the weights array given the amount of inputs*/
             weights = new double[amountOfInputs];
             Randomize(random, -mutationAmount, mutationAmount);
             errorCalc = err;
             mutationLevel = mutationAmount;
             aléatoire = random;
+            this.trainer = trainer;
 
             if (filter != null)
             {
@@ -128,7 +132,7 @@ namespace HillClimber
                 poidsMuté = ref weights[randIndex];
             }
 
-            var mutation = aléatoire.NextDouble() * (aléatoire.Next(0, 2) != 0 ? mutationLevel : -mutationLevel);
+            var mutation = trainer.Mutate(aléatoire, mutationLevel, currentError);
             poidsMuté += mutation;
 
             var newError = GetError(inputs, GetY, bOrM);

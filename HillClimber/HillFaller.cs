@@ -19,8 +19,6 @@ namespace HillClimber
             ref var num = ref nums[random.Next(0, nums.Length)];
             
             var newSlope = errorDerivative(trueError);
-            if (prevSlope == newSlope) 
-                ;
 
             var adder = random.NextDouble();
             if (newSlope == prevSlope)

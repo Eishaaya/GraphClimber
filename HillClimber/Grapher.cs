@@ -10,7 +10,7 @@ namespace HillClimber
 {
     interface IGrapher
     {
-        void Update(List<Button> points, float scaler);
+        void Update(List<Button> points, bool changed, float scaler);
         void Clear();
         float GetY(float x);
         double M { get; }
