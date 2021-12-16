@@ -10,7 +10,7 @@ namespace HillClimber
 {
     class Climber : IGrapher
     {
-        Random random = Extensions.random;
+        protected Random random = Extensions.random;
         public double M { get => nums[0]; }
         protected double b { get => nums[1]; }
 
@@ -19,6 +19,8 @@ namespace HillClimber
         protected bool cleared = false;
 
         protected Func<double, double, double> errorFunc;
+
+        protected double trueError = double.MaxValue;
 
         public Climber(Func<double, double, double> error)
         {
@@ -55,7 +57,7 @@ namespace HillClimber
             }
             Update(points);
         }
-        protected void Update(Vector2[] points)
+        protected virtual void Update(Vector2[] points)
         {
             var oldNums = (double[])nums.Clone();
             Mutate();
@@ -81,7 +83,13 @@ namespace HillClimber
                 error += errorFunc(point.Y, (point.X * M + b));
                 oldError += errorFunc(point.Y, (float)(point.X * oldNums[0] + oldNums[1]));
             }
-            return oldError < error;
+            if (oldError < error)
+            {
+                trueError = oldError;
+                return true;
+            }
+            trueError = error;
+            return false;
         }
     }
 }

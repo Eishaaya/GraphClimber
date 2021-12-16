@@ -13,6 +13,8 @@ namespace HillClimber
         //BigBrainTriangleTest leDorito;
         DoritoGrapher leDorito;
 
+        HillFaller faller;
+
         //public enum TrainType
         //{
         //    Climber,
@@ -187,16 +189,16 @@ namespace HillClimber
                                     "Hill Climber",
                                     "Hill Faller",
                                     "france"
-                                }, 50, 10);
-            sliderPos = new Vector2(sliderPos.X, sliderPos.Y + 120);
+                                }, 20, 10);
+            sliderPos = new Vector2(sliderPos.X, sliderPos.Y + 120 * totalScale);
             thinkingSlider = new Slider(Content.Load<Texture2D>("SliderBall"), Vector2.Zero, Color.White, 0, SpriteEffects.None, new Vector2(20), .9f * totalScale, 1, Color.DarkGray, Color.Gray,
                     new Sprite(Content.Load<Texture2D>("Slider"), sliderPos, new Vector2(200, 12.5f), .9f * totalScale),
                     new Button(Content.Load<Texture2D>("SliderPoint"), Vector2.Zero, new Vector2(8.5f), totalScale), 2, false, rightFont, "AI Type", new string[] {
                                     "None",
                                     "Dorito",                                    
-                    }, 50, 10);
+                    }, 20, 10);
 
-            reset = new Button(Content.Load<Texture2D>("RedButton"), new Vector2(sliderPos.X, sliderPos.Y + 130), Color.White, new Vector2(21, 21.5f), 1, Color.IndianRed, Color.Gray);
+            reset = new Button(Content.Load<Texture2D>("RedButton"), new Vector2(sliderPos.X, sliderPos.Y + 130 * totalScale), Color.White, new Vector2(21, 21.5f), 1, Color.IndianRed, Color.Gray);
 
             MakeButttxt = Content.Load<Texture2D>("MakeButton");
             // LinearButttxt = Content.Load<Texture2D>("LinearButton");
@@ -261,7 +263,7 @@ namespace HillClimber
             graphers = new Dictionary<TrainAndThinkTypes, IGrapher>()
             {
                 { TrainAndThinkTypes.None | TrainAndThinkTypes.Climber, climber },
-                { TrainAndThinkTypes.None | TrainAndThinkTypes.Faller, climber },
+                { TrainAndThinkTypes.None | TrainAndThinkTypes.Faller, faller },
 
                 { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Climber, leDorito },
                 { TrainAndThinkTypes.Dorito | TrainAndThinkTypes.Faller, leDorito },
@@ -530,6 +532,7 @@ namespace HillClimber
         void RunBlock(Vector2 mousePos, bool mouseDown, bool midDown, GameTime gameTime)
         {
             graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.None] = new Climber(AbsoluteError);
+            graphers[TrainAndThinkTypes.Faller | TrainAndThinkTypes.None] = new HillFaller(SquaredError, SquaredDeriv);
             if (graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] == null)
             {
                 graphers[TrainAndThinkTypes.Climber | TrainAndThinkTypes.Dorito] = new DoritoGrapher(points.Count, 1, SquaredError);
@@ -545,6 +548,18 @@ namespace HillClimber
         double AbsoluteError(double correctOutput, double output)
         {
             return Math.Abs(correctOutput - output);
+        }
+        double SquaredDeriv(double error)
+        {
+            return 2 * error;
+        }
+        double AbsoluteDeriv(double error)
+        {
+            if (error != 0)
+            {
+                return error < 0 ? -1 : 1;
+            }
+            return double.NaN;
         }
 
         void DragLogic(Vector2 mousePos, bool mouseDown)
